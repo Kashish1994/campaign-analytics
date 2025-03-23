@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campaign-analytics-worker
+  labels:
+    app: campaign-analytics
+    component: worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: campaign-analytics
+      component: worker
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: campaign-analytics
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: ${REGISTRY_URL}/campaign-analytics-worker:${IMAGE_TAG}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        env:
+        - name: CA_POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: postgres-host
+        - name: CA_POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: postgres-port
+        - name: CA_POSTGRES_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: postgres-database
+        - name: CA_POSTGRES_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: campaign-analytics-secrets
+              key: postgres-username
+        - name: CA_POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: campaign-analytics-secrets
+              key: postgres-password
+        - name: CA_CLICKHOUSE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: clickhouse-host
+        - name: CA_CLICKHOUSE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: clickhouse-port
+        - name: CA_CLICKHOUSE_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: clickhouse-database
+        - name: CA_CLICKHOUSE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: campaign-analytics-secrets
+              key: clickhouse-username
+        - name: CA_CLICKHOUSE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: campaign-analytics-secrets
+              key: clickhouse-password
+        - name: CA_REDIS_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: redis-addr
+        - name: CA_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: campaign-analytics-secrets
+              key: redis-password
+        - name: CA_KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: campaign-analytics-config
+              key: kafka-brokers
+      imagePullSecrets:
+      - name: registry-credentials

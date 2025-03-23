@@ -1,0 +1,79 @@
+# Campaign Analytics Service Configuration
+
+# Server settings
+server:
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 30s
+  idle_timeout: 120s
+
+# Database settings
+postgres:
+  host: localhost
+  port: 5432
+  database: campaign_analytics
+  username: postgres
+  password: postgres
+  sslmode: disable
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+
+clickhouse:
+  host: localhost
+  port: 9000
+  database: campaign_analytics
+  username: default
+  password: ""
+  max_open_conns: 50
+  max_idle_conns: 10
+  conn_max_lifetime: 1h
+
+# Redis settings
+redis:
+  addr: localhost:6379
+  password: ""
+  db: 0
+  pool_size: 10
+  min_idle_conns: 5
+
+# Kafka settings
+kafka:
+  brokers:
+    - localhost:9092
+  consumer:
+    group_id: campaign-analytics-consumer
+  producer:
+    require_acks: all
+    max_attempts: 10
+
+# JWT settings
+jwt:
+  key: your-secret-key-here  # Change this in production
+  expiration: 24h
+
+# Rate limiting
+rate_limiting:
+  default_rate: 100  # requests per minute
+  heavy_rate: 20     # requests per minute for heavy operations
+
+# Ad platform integration settings
+platforms:
+  meta:
+    api_version: v16.0
+    base_url: https://graph.facebook.com/v16.0
+  google:
+    api_version: v13
+    base_url: https://googleads.googleapis.com/v13
+  linkedin:
+    api_version: v2
+    base_url: https://api.linkedin.com/v2
+  tiktok:
+    api_version: v2
+    base_url: https://business-api.tiktok.com/open_api/v2
+
+# Logging
+logging:
+  level: info  # debug, info, warn, error, dpanic, panic, fatal
+  development: false
+  encoding: json

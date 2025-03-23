@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: campaign-analytics-config
+data:
+  postgres-host: "postgres-service"
+  postgres-port: "5432"
+  postgres-database: "campaign_analytics"
+  
+  clickhouse-host: "clickhouse-service"
+  clickhouse-port: "9000"
+  clickhouse-database: "campaign_analytics"
+  
+  redis-addr: "redis-service:6379"
+  
+  kafka-brokers: "kafka-0.kafka-headless:9092,kafka-1.kafka-headless:9092,kafka-2.kafka-headless:9092"
+  
+  logging-level: "info"
+  logging-encoding: "json"
+  
+  # API-specific configs
+  server-port: "8080"
+  server-read-timeout: "10s"
+  server-write-timeout: "30s"
+  server-idle-timeout: "120s"
+  
+  # Rate limiting configs
+  rate-limiting-default-rate: "100"
+  rate-limiting-heavy-rate: "20"
